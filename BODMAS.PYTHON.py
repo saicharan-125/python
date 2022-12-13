@@ -1,10 +1,13 @@
 x=input("enter the first value :")
 y=input("enter the second value :")
-if x.isnumeric() and y.isnumeric():
+if x.isalpha():
+    print("alpha is not allowed")
+elif y.isalpha():
+    print("alpha is not allowed")
+else:
     a=int(x)
     b=int(y)    
-    c=input("enter any opeartor")
-    
+    c=input("enter any opeartor ,+,-,/,*")
     if c=='+':
         print(a+b)
     elif c=='-':
@@ -13,9 +16,5 @@ if x.isnumeric() and y.isnumeric():
         print(a*b)
     elif c=='/':
         print(a/b)
-elif x.isalpha() and y.isalpha():
-    print("both are alphabets ")
-else:
-    print("both are not same")
 
 
