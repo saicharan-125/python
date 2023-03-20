@@ -9,7 +9,7 @@ app.secret_key = "abc123"
 app.secret_key="keyvalue"
 app.config["MYSQL_HOST"]="localhost"
 app.config["MYSQL_USER"]="root"
-app.config["MYSQL_PORT"] = 3308
+app.config["MYSQL_PORT"] = 3306
 app.config["MYSQL_PASSWORD"]=""
 app.config["MYSQL_DB"]="project"
 app.config["MYSQL_CURSORCLASS"]="DictCursor"
@@ -35,6 +35,7 @@ def userflash():
     return render_template("userflash.html")
 
 
+
 @app.route("/adminflash")
 def adminflash():
     return render_template("adminflash.html")
@@ -43,6 +44,13 @@ def adminflash():
 @app.route("/home")
 def home():
     return render_template('overseas.html')
+@app.route("/intake")
+def intake():
+    return render_template('intake.html')
+
+@app.route("/country")
+def country():
+    return render_template('country.html')
 
 @app.route("/admin_dashboard")
 def admin_dashboard():
@@ -56,9 +64,28 @@ def about():
 def contact():
     return render_template("contact.html")
 
+@app.route("/notifications")
+def notifications():
+    return render_template("notifications.html")
+
+@app.route("/universitiesapplied")
+def universitiesapplied():
+    return render_template("universitiesapplied.html")
+
+@app.route("/universitiesapproved")
+def universitiesapproved():
+    return render_template("universitiesapproved.html")
+
+@app.route("/adprofile")
+def adprofile():
+    return render_template("adprofile.html")
+
 @app.route("/student")
 def student():
     return render_template("student.html")
+@app.route("/studentstatus")
+def studentstatus():
+    return render_template("studentstatus.html")
 
 @app.route('/register',methods = ['GET','POST'])
 def register():
@@ -118,19 +145,17 @@ def admin_register():
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
         email = request.form['email']
-
         password = request.form['password']
         cur = mysql.connection.cursor()
-        b = cur.execute('select email,password,username from usertable where email = %s and password = %s and username = %s',(email,password,username))
+        b = cur.execute('select email,password from usertable where email = %s and password = %s ',(email,password))
         mysql.connection.commit()
         if b > 0:
             result = cur.fetchone()
             print(result)
             username1 = result['email']
             session.permanent = True
-            session['username'] = username
+            session['email'] = email
             password1 = result['password']
             if username1 == email and password1 == password:
                 flash("successful logged in")
@@ -142,8 +167,8 @@ def login():
             error = "oops something went wrong"
             return render_template("login.html",error=error)
     else:
-        if 'username' in session:
-            username = session["username"]
+        if 'email' in session:
+            email = session["email"]
             return redirect(url_for('student'))
         else:
             return render_template('login.html')
@@ -153,20 +178,19 @@ def login():
 @app.route('/admin_login', methods=['GET','POST'])
 def admin_login():
     if request.method == 'POST':
-        username= request.form['username']
         email = request.form['email']
         password = request.form['password']
-        print(username)
+        print(email)
         print(password)
         cur = mysql.connection.cursor()
-        c = cur.execute('select username,password,email from admintable where username = %s and password = %s and email =%s',(username,password,email))
+        c = cur.execute('select password,email from admintable where  password = %s and email =%s',(password,email))
         mysql.connection.commit()
         if c > 0:
             result = cur.fetchone()
             print(result)
             username1 = result['email']
             session.permanent = True
-            session['username'] = username
+            session['email'] = email
             password1 = result['password']
             if username1 == email and password1 == password:
                 flash("successful logged in")
@@ -178,8 +202,8 @@ def admin_login():
             error = "oops something went wrong"
             return render_template("admin_login.html", error=error)
     else:
-        if 'username' in session:
-            username = session["username"]
+        if 'email' in session:
+            email = session["email"]
             return redirect(url_for('admin_dashboard'))
         else:
             return render_template('admin_login.html')
@@ -214,6 +238,18 @@ def validate():
 @app.route("/send")
 def send():
     return render_template("send.html")
+
+@app.route("/dbfetch")
+def user():
+    cur = mysql.connection.cursor()
+    r = cur.execute('select * from usertable')
+    mysql.connection.commit()
+    if r>0:
+        re = cur.fetchall()
+        print(re)
+        return render_template("dbfetch.html",result=re)
+    cur.close()
+    return render_template("dbfetch.html")
 
 if __name__ == "__main__":
     app.run(debug="True")
